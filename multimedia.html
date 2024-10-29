@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimedia CRISCOLOR C.B.C M-Q 2010</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header img {
+            max-width: 200px;
+        }
+
+        .nav {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #333;
+            padding: 10px 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .upload-button {
+            background-color: #0087F7;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+
+        .upload-button:hover {
+            background-color: #0069c4;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .gallery-item img, 
+        .gallery-item video {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .date-selector {
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="escudo_cbc.png" alt="Escudo CBC Manises Quart">
+        <h1>Multimedia CRISCOLOR C.B.C M-Q 2010</h1>
+    </div>
+
+    <div class="nav">
+        <a href="index.html">← Volver a Partidos</a>
+    </div>
+
+    <div class="date-selector section">
+        <h2>Seleccionar Partido</h2>
+        <select id="matchSelector">
+            <option value="">Selecciona un partido...</option>
+            <option value="2024-10-20">20/10/2024 - CRISCOLOR C.B.C M-Q 2010 vs MISLATA BC NARANJA B</option>
+            <option value="2024-11-30">30/11/2024 - NB TORRENT 2009 vs CRISCOLOR C.B.C M-Q 2010</option>
+            <option value="2024-11-02">02/11/2024 - CRISCOLOR C.B.C M-Q 2010 vs C.B. BENETUSSER</option>
+            <!-- Añadir el resto de partidos -->
+        </select>
+    </div>
+
+    <div class="section">
+        <h2>Subir Fotos y Videos</h2>
+        <button id="upload_widget" class="upload-button">Subir Fotos y Videos</button>
+    </div>
+
+    <div class="section">
+        <h2>Galería</h2>
+        <div class="gallery" id="mediaGallery">
+            <!-- Las imágenes y videos se cargarán aquí dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        // Configuración del widget de Cloudinary
+        const cloudinaryWidget = cloudinary.createUploadWidget(
+            {
+                cloudName: 'djj8wav2q', // Reemplazar con tu cloud_name de Cloudinary
+                uploadPreset: 'cbcfotosyvideos', // Reemplazar con tu upload_preset
+                folder: 'cbc-multimedia',
+                tags: ['cbc'],
+                maxFileSize: 50000000, // 50MB
+                maxFiles: 20,
+                resourceType: ['image', 'video'],
+                context: {
+                    alt: 'CBC Multimedia'
+                },
+            },
+            (error, result) => {
+                if (!error && result && result.event === "success") {
+                    console.log('Archivo subido con éxito:', result.info);
+                    // Guardar la información en localStorage
+                    saveMediaInfo(result.info);
+                    // Actualizar la galería
+                    updateGallery();
+                }
+            }
+        );
+
+        document.getElementById("upload_widget").addEventListener(
+            "click",
+            function() {
+                const matchDate = document.getElementById('matchSelector').value;
+                if (!matchDate) {
+                    alert('Por favor, selecciona primero un partido');
+                    return;
+                }
+                cloudinaryWidget.open();
+            },
+            false
+        );
+
+        function saveMediaInfo(mediaInfo) {
+            const matchDate = document.getElementById('matchSelector').value;
+            let mediaData = JSON.parse(localStorage.getItem('cbcMedia') || '{}');
+            
+            if (!mediaData[matchDate]) {
+                mediaData[matchDate] = [];
+            }
+            
+            mediaData[matchDate].push({
+                url: mediaInfo.secure_url,
+                type: mediaInfo.resource_type,
+                timestamp: new Date().toISOString()
+            });
+            
+            localStorage.setItem('cbcMedia', JSON.stringify(mediaData));
+        }
+
+        function updateGallery() {
+            const matchDate = document.getElementById('matchSelector').value;
+            const gallery = document.getElementById('mediaGallery');
+            gallery.innerHTML = '';
+            
+            if (!matchDate) return;
+            
+            const mediaData = JSON.parse(localStorage.getItem('cbcMedia') || '{}');
+            const matchMedia = mediaData[matchDate] || [];
+            
+            matchMedia.forEach(media => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                
+                if (media.type === 'image') {
+                    item.innerHTML = `<img src="${media.url}" alt="Foto del partido">`;
+                } else if (media.type === 'video') {
+                    item.innerHTML = `
+                        <video controls>
+                            <source src="${media.url}" type="video/mp4">
+                            Tu navegador no soporta el elemento de video.
+                        </video>
+                    `;
+                }
+                
+                gallery.appendChild(item);
+            });
+        }
+
+        document.getElementById('matchSelector').addEventListener('change', updateGallery);
+        
+        // Cargar la galería al iniciar
+        updateGallery();
+    </script>
+</body>
