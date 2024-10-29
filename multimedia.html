@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multimedia CRISCOLOR C.B.C M-Q 2010</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <style>
         body {
@@ -93,6 +91,15 @@
             border-radius: 5px;
             border: 1px solid #ddd;
         }
+
+        .error-message {
+            color: red;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid red;
+            border-radius: 5px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -112,60 +119,74 @@
             <option value="2024-10-20">20/10/2024 - CRISCOLOR C.B.C M-Q 2010 vs MISLATA BC NARANJA B</option>
             <option value="2024-11-30">30/11/2024 - NB TORRENT 2009 vs CRISCOLOR C.B.C M-Q 2010</option>
             <option value="2024-11-02">02/11/2024 - CRISCOLOR C.B.C M-Q 2010 vs C.B. BENETUSSER</option>
-            <!-- Añadir el resto de partidos -->
         </select>
     </div>
 
     <div class="section">
         <h2>Subir Fotos y Videos</h2>
         <button id="upload_widget" class="upload-button">Subir Fotos y Videos</button>
+        <div id="error-message" class="error-message"></div>
     </div>
 
     <div class="section">
         <h2>Galería</h2>
-        <div class="gallery" id="mediaGallery">
-            <!-- Las imágenes y videos se cargarán aquí dinámicamente -->
-        </div>
+        <div class="gallery" id="mediaGallery"></div>
     </div>
 
     <script>
-        // Configuración del widget de Cloudinary
-        const cloudinaryWidget = cloudinary.createUploadWidget(
-            {
-                cloudName: 'djj8wav2q', // Reemplazar con tu cloud_name de Cloudinary
-                uploadPreset: 'cbcfotosyvideos', // Reemplazar con tu upload_preset
-                folder: 'cbc-multimedia',
-                tags: ['cbc'],
-                maxFileSize: 50000000, // 50MB
-                maxFiles: 20,
-                resourceType: ['image', 'video'],
-                context: {
-                    alt: 'CBC Multimedia'
-                },
-            },
-            (error, result) => {
-                if (!error && result && result.event === "success") {
-                    console.log('Archivo subido con éxito:', result.info);
-                    // Guardar la información en localStorage
-                    saveMediaInfo(result.info);
-                    // Actualizar la galería
-                    updateGallery();
+        var myWidget = cloudinary.createUploadWidget({
+            cloudName: 'djj8wav2q', // Tu cloud_name
+            uploadPreset: 'cbcfotosyvideos', // Tu upload_preset
+            sources: ['local', 'camera'],
+            multiple: true,
+            maxFiles: 10,
+            maxFileSize: 15000000, // 15MB
+            folder: 'cbc',
+            clientAllowedFormats: ['jpg', 'png', 'gif', 'jpeg', 'mp4', 'mov'],
+            text: {
+                'es': {
+                    'queue': {
+                        'title': 'Archivos para subir',
+                        'title_uploading_with_counter': 'Subiendo {{num}} archivos',
+                        'title_uploading': 'Subiendo archivos',
+                        'done': 'Subida completada'
+                    },
+                    'local': {
+                        'browse': 'Examinar',
+                        'dd_title_single': 'Arrastra y suelta un archivo aquí',
+                        'dd_title_multi': 'Arrastra y suelta archivos aquí',
+                        'drop_title_single': 'Arrastra un archivo para subir',
+                        'drop_title_multi': 'Arrastra archivos para subir'
+                    }
                 }
             }
-        );
+        }, (error, result) => {
+            if (error) {
+                console.error('Error en la subida:', error);
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').textContent = 
+                    'Error al subir el archivo: ' + (error.message || 'Por favor, intenta de nuevo');
+                return;
+            }
 
-        document.getElementById("upload_widget").addEventListener(
-            "click",
-            function() {
-                const matchDate = document.getElementById('matchSelector').value;
-                if (!matchDate) {
-                    alert('Por favor, selecciona primero un partido');
-                    return;
-                }
-                cloudinaryWidget.open();
-            },
-            false
-        );
+            if (result && result.event === "success") {
+                console.log('Subida exitosa:', result.info);
+                saveMediaInfo(result.info);
+                updateGallery();
+            }
+        });
+
+        document.getElementById("upload_widget").addEventListener("click", function() {
+            const matchDate = document.getElementById('matchSelector').value;
+            if (!matchDate) {
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').textContent = 
+                    'Por favor, selecciona primero un partido';
+                return;
+            }
+            document.getElementById('error-message').style.display = 'none';
+            myWidget.open();
+        }, false);
 
         function saveMediaInfo(mediaInfo) {
             const matchDate = document.getElementById('matchSelector').value;
@@ -214,8 +235,7 @@
         }
 
         document.getElementById('matchSelector').addEventListener('change', updateGallery);
-        
-        // Cargar la galería al iniciar
         updateGallery();
     </script>
 </body>
+</html>
