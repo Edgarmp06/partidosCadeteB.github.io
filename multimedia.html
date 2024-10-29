@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multimedia CRISCOLOR C.B.C M-Q 2010</title>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -146,6 +149,23 @@
     </div>
 
     <script>
+       // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyATEpaVrzSj8yQH_QQeq2QRbbwcWsSY5ic",
+            authDomain: "cbc-multimedia.firebaseapp.com",
+            databaseURL: "https://cbc-multimedia-default-rtdb.firebaseio.com",
+            projectId: "cbc-multimedia",
+            storageBucket: "cbc-multimedia.appspot.com",
+            messagingSenderId: "378965067272",
+            appId: "1:378965067272:web:4d7ccd247e58523a8f33bd",
+            measurementId: "G-2P1V6VDKP6"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Configuración del widget de Cloudinary
         var myWidget = cloudinary.createUploadWidget({
             cloudName: 'djj8wav2q',
             uploadPreset: 'cbcfotosyvideos',
@@ -167,10 +187,70 @@
             if (result && result.event === "success") {
                 console.log('Subida exitosa:', result.info);
                 saveMediaInfo(result.info);
-                updateGallery();
             }
         });
 
+        // Función para guardar información en Firebase
+        function saveMediaInfo(mediaInfo) {
+            const matchDate = document.getElementById('matchSelector').value;
+            if (!matchDate) return;
+
+            const mediaRef = database.ref('media/' + matchDate);
+            mediaRef.push({
+                url: mediaInfo.secure_url,
+                type: mediaInfo.resource_type,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // Función para eliminar media de Firebase
+        function deleteMedia(mediaKey, matchDate) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
+                const mediaRef = database.ref('media/' + matchDate + '/' + mediaKey);
+                mediaRef.remove();
+            }
+        }
+
+        // Función para actualizar la galería
+        function updateGallery() {
+            const matchDate = document.getElementById('matchSelector').value;
+            const gallery = document.getElementById('mediaGallery');
+            gallery.innerHTML = '';
+            
+            if (!matchDate) return;
+
+            const mediaRef = database.ref('media/' + matchDate);
+            mediaRef.on('value', (snapshot) => {
+                gallery.innerHTML = '';
+                const mediaData = snapshot.val() || {};
+
+                Object.entries(mediaData).forEach(([key, media]) => {
+                    const item = document.createElement('div');
+                    item.className = 'gallery-item';
+                    
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-button';
+                    deleteButton.textContent = 'Eliminar';
+                    deleteButton.onclick = () => deleteMedia(key, matchDate);
+                    
+                    if (media.type === 'image') {
+                        item.innerHTML = `<img src="${media.url}" alt="Foto del partido">`;
+                    } else if (media.type === 'video') {
+                        item.innerHTML = `
+                            <video controls>
+                                <source src="${media.url}" type="video/mp4">
+                                Tu navegador no soporta el elemento de video.
+                            </video>
+                        `;
+                    }
+                    
+                    item.appendChild(deleteButton);
+                    gallery.appendChild(item);
+                });
+            });
+        }
+
+        // Event Listeners
         document.getElementById("upload_widget").addEventListener("click", function() {
             const matchDate = document.getElementById('matchSelector').value;
             if (!matchDate) {
@@ -183,72 +263,9 @@
             myWidget.open();
         }, false);
 
-        function saveMediaInfo(mediaInfo) {
-            const matchDate = document.getElementById('matchSelector').value;
-            let mediaData = JSON.parse(localStorage.getItem('cbcMedia') || '{}');
-            
-            if (!mediaData[matchDate]) {
-                mediaData[matchDate] = [];
-            }
-            
-            mediaData[matchDate].push({
-                url: mediaInfo.secure_url,
-                type: mediaInfo.resource_type,
-                timestamp: new Date().toISOString()
-            });
-            
-            localStorage.setItem('cbcMedia', JSON.stringify(mediaData));
-        }
-
-        function deleteMedia(url) {
-            if (confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
-                const matchDate = document.getElementById('matchSelector').value;
-                let mediaData = JSON.parse(localStorage.getItem('cbcMedia') || '{}');
-                
-                if (mediaData[matchDate]) {
-                    mediaData[matchDate] = mediaData[matchDate].filter(item => item.url !== url);
-                    localStorage.setItem('cbcMedia', JSON.stringify(mediaData));
-                    updateGallery();
-                }
-            }
-        }
-
-        function updateGallery() {
-            const matchDate = document.getElementById('matchSelector').value;
-            const gallery = document.getElementById('mediaGallery');
-            gallery.innerHTML = '';
-            
-            if (!matchDate) return;
-            
-            const mediaData = JSON.parse(localStorage.getItem('cbcMedia') || '{}');
-            const matchMedia = mediaData[matchDate] || [];
-            
-            matchMedia.forEach(media => {
-                const item = document.createElement('div');
-                item.className = 'gallery-item';
-                
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'delete-button';
-                deleteButton.textContent = 'Eliminar';
-                deleteButton.onclick = () => deleteMedia(media.url);
-                
-                if (media.type === 'image') {
-                    item.innerHTML = `<img src="${media.url}" alt="Foto del partido">`;
-                } else if (media.type === 'video') {
-                    item.innerHTML = `
-                        <video controls>
-                            <source src="${media.url}" type="video/mp4">
-                            Tu navegador no soporta el elemento de video.
-                        </video>
-                    `;
-                }
-                
-                item.appendChild(deleteButton);
-                gallery.appendChild(item);
-            });
-        }
-
         document.getElementById('matchSelector').addEventListener('change', updateGallery);
+
+        // Cargar la galería al inicio
         updateGallery();
     </script>
 </body>
