@@ -81,9 +81,21 @@
             object-fit: cover;
         }
 
-        .date-selector {
-            margin-bottom: 20px;
-            padding: 10px;
+        .delete-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .delete-button:hover {
+            background-color: darkred;
         }
 
         select {
@@ -135,31 +147,14 @@
 
     <script>
         var myWidget = cloudinary.createUploadWidget({
-            cloudName: 'djj8wav2q', // Tu cloud_name
-            uploadPreset: 'cbcfotosyvideos', // Tu upload_preset
+            cloudName: 'djj8wav2q',
+            uploadPreset: 'cbcfotosyvideos',
             sources: ['local', 'camera'],
             multiple: true,
             maxFiles: 10,
-            maxFileSize: 15000000, // 15MB
+            maxFileSize: 15000000,
             folder: 'cbc',
-            clientAllowedFormats: ['jpg', 'png', 'gif', 'jpeg', 'mp4', 'mov'],
-            text: {
-                'es': {
-                    'queue': {
-                        'title': 'Archivos para subir',
-                        'title_uploading_with_counter': 'Subiendo {{num}} archivos',
-                        'title_uploading': 'Subiendo archivos',
-                        'done': 'Subida completada'
-                    },
-                    'local': {
-                        'browse': 'Examinar',
-                        'dd_title_single': 'Arrastra y suelta un archivo aquí',
-                        'dd_title_multi': 'Arrastra y suelta archivos aquí',
-                        'drop_title_single': 'Arrastra un archivo para subir',
-                        'drop_title_multi': 'Arrastra archivos para subir'
-                    }
-                }
-            }
+            clientAllowedFormats: ['jpg', 'png', 'gif', 'jpeg', 'mp4', 'mov']
         }, (error, result) => {
             if (error) {
                 console.error('Error en la subida:', error);
@@ -205,6 +200,19 @@
             localStorage.setItem('cbcMedia', JSON.stringify(mediaData));
         }
 
+        function deleteMedia(url) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
+                const matchDate = document.getElementById('matchSelector').value;
+                let mediaData = JSON.parse(localStorage.getItem('cbcMedia') || '{}');
+                
+                if (mediaData[matchDate]) {
+                    mediaData[matchDate] = mediaData[matchDate].filter(item => item.url !== url);
+                    localStorage.setItem('cbcMedia', JSON.stringify(mediaData));
+                    updateGallery();
+                }
+            }
+        }
+
         function updateGallery() {
             const matchDate = document.getElementById('matchSelector').value;
             const gallery = document.getElementById('mediaGallery');
@@ -219,6 +227,11 @@
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
+                deleteButton.textContent = 'Eliminar';
+                deleteButton.onclick = () => deleteMedia(media.url);
+                
                 if (media.type === 'image') {
                     item.innerHTML = `<img src="${media.url}" alt="Foto del partido">`;
                 } else if (media.type === 'video') {
@@ -230,6 +243,7 @@
                     `;
                 }
                 
+                item.appendChild(deleteButton);
                 gallery.appendChild(item);
             });
         }
