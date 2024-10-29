@@ -81,6 +81,13 @@
             width: 100%;
             height: 200px;
             object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item img:hover,
+        .gallery-item video:hover {
+            transform: scale(1.05);
         }
 
         .delete-button {
@@ -94,6 +101,7 @@
             padding: 5px 10px;
             cursor: pointer;
             font-size: 14px;
+            z-index: 2;
         }
 
         .delete-button:hover {
@@ -117,6 +125,71 @@
             border: 1px solid red;
             border-radius: 5px;
             display: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 80vh;
+            margin: auto;
+        }
+
+        .modal-content img,
+        .modal-content video {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 1001;
+            background: none;
+            border: none;
+            padding: 5px 10px;
+        }
+
+        .download-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0087F7;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 1001;
+        }
+
+        .download-button:hover {
+            background-color: #0069c4;
         }
 
         .date-selector {
@@ -156,6 +229,12 @@
         <div class="gallery" id="mediaGallery"></div>
     </div>
 
+    <!-- Modal para visualización -->
+    <div id="mediaModal" class="modal">
+        <button class="close-modal" onclick="closeModal()">×</button>
+        <div class="modal-content" id="modalContent"></div>
+        <button class="download-button" onclick="downloadMedia()">Descargar</button>
+    </div>
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
@@ -172,6 +251,9 @@
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+
+        // Variable global para almacenar la URL del medio actual
+        let currentMediaUrl = '';
 
         // Generar o recuperar el ID del dispositivo
         function getDeviceId() {
@@ -209,6 +291,54 @@
                 saveMediaInfo(result.info);
             }
         });
+
+        // Función para abrir el modal
+        function openModal(url, type) {
+            const modal = document.getElementById('mediaModal');
+            const modalContent = document.getElementById('modalContent');
+            currentMediaUrl = url;
+
+            if (type === 'image') {
+                modalContent.innerHTML = `<img src="${url}" alt="Imagen">`;
+            } else if (type === 'video') {
+                modalContent.innerHTML = `
+                    <video controls>
+                        <source src="${url}" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                `;
+            }
+
+            modal.classList.add('show');
+        }
+
+        // Función para cerrar el modal
+        function closeModal() {
+            const modal = document.getElementById('mediaModal');
+            modal.classList.remove('show');
+            currentMediaUrl = '';
+        }
+
+        // Función para descargar el medio actual
+        async function downloadMedia() {
+            if (!currentMediaUrl) return;
+
+            try {
+                const response = await fetch(currentMediaUrl);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'CBC_Media_' + new Date().getTime();
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            } catch (error) {
+                console.error('Error al descargar:', error);
+                alert('Error al descargar el archivo');
+            }
+        }
 
         // Función para guardar información en Firebase
         function saveMediaInfo(mediaInfo) {
@@ -259,10 +389,10 @@
                     }
                     
                     if (media.type === 'image') {
-                        item.innerHTML = `<img src="${media.url}" alt="Foto del partido">`;
+                        item.innerHTML = `<img src="${media.url}" alt="Foto del partido" onclick="openModal('${media.url}', 'image')">`;
                     } else if (media.type === 'video') {
                         item.innerHTML = `
-                            <video controls>
+                            <video onclick="openModal('${media.url}', 'video')">
                                 <source src="${media.url}" type="video/mp4">
                                 Tu navegador no soporta el elemento de video.
                             </video>
@@ -274,6 +404,13 @@
                 });
             });
         }
+
+        // Cerrar modal al hacer clic fuera de la imagen
+        document.getElementById('mediaModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
 
         // Event Listeners
         document.getElementById("upload_widget").addEventListener("click", function() {
