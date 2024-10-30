@@ -3,216 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partidos de CRISCOLOR C.B.C M-Q 2010</title>
+    <title>CRISCOLOR C.B.C M-Q 2010</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #000000;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        .header img {
-            width: 100px;
-            height: 100px;
-            margin-left: 30px;
-            position: right;
-        }
-        h1 {
-            color: #ff8800;
-            text-align: center;
-            font-size: 2.1em;
-        }
-        .jugadores-lista{
-            color: #ff0000;
-            font-size: 2.1em;
-            
-        }
-        .multimedia-link{
-            color: #ff0000;
-            font-size: 2.1em;
-            margin-bottom: 30px;
-        }
-        .match {
-            background-color: #ffffff;
-            border: 3px solid #ff8800;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            box-shadow:0px 0px 45px #ff8800;
-        }
-        .match h2 {
-            color: #001aff;
-            margin-top: 0;
-        }
-            .match-header {
-            display: flex;
-            align-items: center;
-        }
-        .match-header h2 {
             margin: 0;
-            margin-right: 10px;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            flex-direction: column;
         }
-        .match-header img {
-            width: 30px;
-            height: 30px;
+
+        header {
+            text-align: center;
+            padding: 2rem;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .match p {
-            margin: 5px 0;
+
+        .logo {
+            max-width: 200px;
+            margin-bottom: 1rem;
         }
-        .map-link {
-            color: #ff00b3;
+
+        .menu-container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .menu-item {
+            background: white;
+            width: 300px;
+            height: 300px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-decoration: none;
-            
+            color: #333;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .map-link:hover {
-            text-decoration: underline;
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
-        .win{
-            color:#016101
+
+        .menu-item i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #4a90e2;
         }
-        .lost{
-            color: #ff0000;
+
+        .menu-item h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .contact-section {
+            background: white;
+            padding: 2rem;
+            margin-top: auto;
+            text-align: center;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+        }
+
+        .whatsapp-button {
+            display: inline-flex;
+            align-items: center;
+            background-color: #25D366;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .whatsapp-button:hover {
+            background-color: #128C7E;
+        }
+
+        .whatsapp-button i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .menu-item {
+                width: 250px;
+                height: 250px;
+            }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="header">
-    <h1>Partidos de CRISCOLOR C.B.C M-Q 2010</h1>
-    <img src="escudo_cbc.png" title="Escudo CBC Manises Quart">
-</div>
-<div class="jugadores-lista">
-    <p><a href="jugadores.html">JUGADORES</a></p>
-    </div>
-    <div class="multimedia-link">
-        <a href="multimedia.html">FOTOS Y VIDEOS DE PARTIDOS</a>
-    </div>
-</h1>
-    <div class="match">
-        <div class="match-header">
-            <h2>Jornada 1</h2>
-            <img src="casa.jpg" title="En casa" />
-        </div>
-        <p><strong>Fecha:</strong> 20/10/2024</p>
-        <p><strong>Hora:</strong> 09:45</p>
-        <p><strong>Partido:</strong> CRISCOLOR C.B.C M-Q 2010 vs MISLATA BC NARANJA B</p>
-        <p><strong>Lugar:</strong> <a href="https://www.google.com/maps/search/PAB+MUNI+ALBERTO+ARNAL+ANDRES" target="_blank" class="map-link">PAB MUNI ALBERTO ARNAL ANDRES</a></p>
-        <p><strong>Resultado:</strong><a class="win">59-50</a></p>
+    <header>
+        <img src="escudo_cbc.png" alt="Escudo CBC" class="logo">
+        <h1>CRISCOLOR C.B.C M-Q 2010</h1>
+    </header>
+
+    <div class="menu-container">
+        <a href="jugadores.html" class="menu-item">
+            <i class="fas fa-users"></i>
+            <h2>Jugadores</h2>
+        </a>
+        <a href="partidos.html" class="menu-item">
+            <i class="fas fa-basketball-ball"></i>
+            <h2>Partidos</h2>
+        </a>
+        <a href="multimedia.html" class="menu-item">
+            <i class="fas fa-photo-video"></i>
+            <h2>Fotos y Videos</h2>
+        </a>
     </div>
 
-    <div class="match">
-        <div class="match-header">
-            <h2>Jornada 2 (APLAZADO)</h2>
-            <img src="avion.jpg" title="Fuera" />
-        </div>
-        <p><strong>Fecha:</strong> 30/11/2024</p>
-        <p><strong>Hora:</strong> 16:00</p>
-        <p><strong>Partido:</strong> NB TORRENT 2009 vs CRISCOLOR C.B.C M-Q 2010</p>
-        <p><strong>Lugar:</strong> <a href="https://www.google.com/maps/search/PAB+MUNI+EL+VEDAT" target="_blank" class="map-link">PAB MUNI EL VEDAT</a></p>
-        <p><strong>Resultado:</strong></p>
-    </div>
-
-    <div class="match">
-        <div class="match-header">
-            <h2>Jornada 3</h2>
-            <img src="casa.jpg" title="En casa" />
-        </div>
-        <p><strong>Fecha:</strong> 02/11/2024</p>
-        <p><strong>Hora:</strong> 09:45</p>
-        <p><strong>Partido:</strong> CRISCOLOR C.B.C M-Q 2010 vs C.B. BENETUSSER</p>
-        <p><strong>Lugar:</strong> <a href="https://acortar.link/f5yYwy" target="_blank" class="map-link">IES RIU TURIA</a></p>
-        <p><strong>Resultado:</strong></p>
-    </div>
-
-    <div class="match">
-        <div class="match-header">
-            <h2>Jornada 4</h2>
-            <img src="avion.jpg" title="Fuera" />
-        </div>
-        <p><strong>Fecha:</strong> 09/11/2024</p>
-        <p><strong>Hora:</strong> 13:00</p>
-        <p><strong>Partido:</strong> CB GRAO vs CRISCOLOR C.B.C M-Q 2010</p>
-        <p><strong>Lugar:</strong> <a href="https://www.google.com/maps/search/PAB+MUNI+NAZARET" target="_blank" class="map-link">PAB MUNI NAZARET</a></p>
-        <p><strong>Resultado:</strong></p>
-    </div>
-
-    <div class="match">
-        <div class="match-header">
-            <h2>Jornada 5</h2>
-            <img src="casa.jpg" title="En casa" />
-        </div>
-        <p><strong>Fecha:</strong> 17/11/2024</p>
-        <p><strong>Hora:</strong> 09:45</p>
-        <p><strong>Partido:</strong> CRISCOLOR C.B.C M-Q 2010 vs LA LLUM BC - CM</p>
-        <p><strong>Lugar:</strong> <a href="https://www.google.com/maps/search/PAB+MUNI+ALBERTO+ARNAL+ANDRES" target="_blank" class="map-link">PAB MUNI ALBERTO ARNAL ANDRES</a></p>
-        <p><strong>Resultado:</strong></p>
-    </div>
-
-    <div class="match">
-        <div class="match-header">
-            <h2>Jornada 6</h2>
-            <img src="avion.jpg" title="Fuera" />
-        </div>
-        <p><strong>Fecha:</strong> 24/11/2024</p>
-        <p><strong>Hora:</strong> 12:45</p>
-        <p><strong>Partido:</strong> MISLATA BC NARANJA B vs CRISCOLOR C.B.C M-Q 2010</p>
-        <p><strong>Lugar:</strong> <a href="https://www.google.com/maps/search/PAB+MUNI+EL+QUINT" target="_blank" class="map-link">PAB MUNI EL QUINT</a></p>
-        <p><strong>Resultado:</strong></p>
-    </div>
-
-    <div class="match">
-        <div class="match-header">
-            <h2>Jornada 7</h2>
-            <img src="casa.jpg" title="En casa" />
-        </div>
-        <p><strong>Fecha:</strong> 01/12/2024</p>
-        <p><strong>Hora:</strong> 09:45</p>
-        <p><strong>Partido:</strong> CRISCOLOR C.B.C M-Q 2010 vs NB TORRENT 2009</p>
-        <p><strong>Lugar:</strong> <a href="https://www.google.com/maps/search/PAB+MUNI+ALBERTO+ARNAL+ANDRES" target="_blank" class="map-link">PAB MUNI ALBERTO ARNAL ANDRES</a></p>
-        <p><strong>Resultado:</strong></p>
-    </div>
-
-    <div class="match">
-        <div class="match-header">
-            <h2>Jornada 8</h2>
-            <img src="avion.jpg" title="Fuera" />
-        </div>
-        <p><strong>Fecha:</strong> 07/12/2024</p>
-        <p><strong>Hora:</strong> 10:00</p>
-        <p><strong>Partido:</strong> C.B. BENETUSSER vs CRISCOLOR C.B.C M-Q 2010</p>
-        <p><strong>Lugar:</strong> <a href="https://bit.ly/4fapEfg" target="_blank" class="map-link">PAB MUNI BENETUSSER</a></p>
-        <p><strong>Resultado:</strong></p>
-    </div>
-
-    <div class="match">
-        <div class="match-header">
-            <h2>Jornada 9</h2>
-            <img src="casa.jpg" title="En casa" />
-        </div>
-        <p><strong>Fecha:</strong> 15/12/2024</p>
-        <p><strong>Hora:</strong> 09:45</p>
-        <p><strong>Partido:</strong> CRISCOLOR C.B.C M-Q 2010 vs CB GRAO</p>
-        <p><strong>Lugar:</strong> <a href="https://www.google.com/maps/search/PAB+MUNI+ALBERTO+ARNAL+ANDRES" target="_blank" class="map-link">PAB MUNI ALBERTO ARNAL ANDRES</a></p>
-        <p><strong>Resultado:</strong></p>
-    </div>
-
-    <div class="match">
-        <div class="match-header">
-            <h2>Jornada 10</h2>
-            <img src="avion.jpg" title="Fuera" />
-        </div>
-        <p><strong>Fecha:</strong> 21/12/2024</p>
-        <p><strong>Hora:</strong> 12:30</p>
-        <p><strong>Partido:</strong> LA LLUM BC - CM vs CRISCOLOR C.B.C M-Q 2010</p>
-        <p><strong>Lugar:</strong> <a href="https://www.google.com/maps/search/POLI+MUNI+BARRIO+LA+LLUM" target="_blank" class="map-link">POLI MUNI BARRIO LA LLUM</a></p>
-        <p><strong>Resultado:</strong></p>
-        
+    <div class="contact-section">
+        <h2>Buzón de Sugerencias</h2>
+        <p>¿Tienes alguna sugerencia o consulta? ¡Contáctame por WhatsApp!</p>
+        <a href="https://wa.me/+34679426134" class="whatsapp-button" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+            Enviar mensaje
+        </a>
     </div>
 </body>
 </html>
